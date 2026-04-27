@@ -8,6 +8,12 @@
 ![100% client-side](https://img.shields.io/badge/100%25-client--side-success)
 ![No tracking](https://img.shields.io/badge/tracking-none-success)
 
+<p align="center">
+  <img src="docs/stack-and-cut.svg" alt="How stack-and-cut numbering works" width="720" />
+</p>
+
+**Try it live →** <https://mcpeixoto.github.io/Rifas/>
+
 100% no browser. Sem servidor, sem login, sem tracking. O PDF nunca sai do teu computador.
 
 ---

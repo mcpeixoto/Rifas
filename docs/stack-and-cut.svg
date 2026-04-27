@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 360" width="720" height="360" font-family="Inter, -apple-system, sans-serif">
+  <style>
+    .bg { fill: #fafafa; }
+    .page { fill: #ffffff; stroke: #d2d2d7; stroke-width: 1; }
+    .cell-line { stroke: #e6e6eb; stroke-width: 0.6; stroke-dasharray: 2 2; }
+    .num { fill: #16161a; font-weight: 600; font-size: 11px; text-anchor: middle; }
+    .label { fill: #6e6e78; font-size: 11px; }
+    .title { fill: #16161a; font-size: 13px; font-weight: 600; }
+    .arrow { stroke: #1f6feb; fill: #1f6feb; }
+    .strip-fill-1 { fill: #eef6ff; }
+    .strip-fill-2 { fill: #fff5ed; }
+    .strip-fill-3 { fill: #f3f0ff; }
+    .strip-fill-4 { fill: #ecf9f0; }
+
+    /* stage cycle: pages -> stack -> cut -> strips */
+    @keyframes pages   { 0%, 22% { opacity: 1 } 28%, 100% { opacity: 0 } }
+    @keyframes stack   { 0%, 22% { opacity: 0 } 28%, 50% { opacity: 1 } 56%, 100% { opacity: 0 } }
+    @keyframes cut     { 0%, 50% { opacity: 0 } 56%, 70% { opacity: 1 } 76%, 100% { opacity: 0 } }
+    @keyframes strips  { 0%, 70% { opacity: 0 } 76%, 100% { opacity: 1 } }
+
+    #stage-pages  { animation: pages   6s ease-in-out infinite; }
+    #stage-stack  { animation: stack   6s ease-in-out infinite; }
+    #stage-cut    { animation: cut     6s ease-in-out infinite; }
+    #stage-strips { animation: strips  6s ease-in-out infinite; }
+
+    @keyframes blade-move { 0%, 56% { transform: translateX(0) } 70% { transform: translateX(280px) } 100% { transform: translateX(280px) } }
+    .blade { animation: blade-move 6s ease-in-out infinite; transform-origin: 0 0; }
+  </style>
+
+  <rect class="bg" x="0" y="0" width="720" height="360"/>
+  <text class="title" x="360" y="28" text-anchor="middle">Stack 10 pages, cut once, tickets come out in order</text>
+
+  <!-- ============== STAGE 1: 3 pages side by side ============== -->
+  <g id="stage-pages">
+    <text class="label" x="360" y="56" text-anchor="middle">3 of 10 pages — each page interleaves numbers across the set</text>
+
+    <!-- page 1 -->
+    <g transform="translate(80,80)">
+      <rect class="page" x="0" y="0" width="160" height="220" rx="4"/>
+      <line class="cell-line" x1="80" y1="0" x2="80" y2="220"/>
+      <line class="cell-line" x1="0" y1="55" x2="160" y2="55"/>
+      <line class="cell-line" x1="0" y1="110" x2="160" y2="110"/>
+      <line class="cell-line" x1="0" y1="165" x2="160" y2="165"/>
+      <text class="num" x="40" y="32">1</text>   <text class="num" x="120" y="32">11</text>
+      <text class="num" x="40" y="87">21</text>  <text class="num" x="120" y="87">31</text>
+      <text class="num" x="40" y="142">41</text> <text class="num" x="120" y="142">51</text>
+      <text class="num" x="40" y="197">61</text> <text class="num" x="120" y="197">71</text>
+      <text class="label" x="80" y="240" text-anchor="middle">page 1</text>
+    </g>
+
+    <!-- page 2 -->
+    <g transform="translate(280,80)">
+      <rect class="page" x="0" y="0" width="160" height="220" rx="4"/>
+      <line class="cell-line" x1="80" y1="0" x2="80" y2="220"/>
+      <line class="cell-line" x1="0" y1="55" x2="160" y2="55"/>
+      <line class="cell-line" x1="0" y1="110" x2="160" y2="110"/>
+      <line class="cell-line" x1="0" y1="165" x2="160" y2="165"/>
+      <text class="num" x="40" y="32">2</text>   <text class="num" x="120" y="32">12</text>
+      <text class="num" x="40" y="87">22</text>  <text class="num" x="120" y="87">32</text>
+      <text class="num" x="40" y="142">42</text> <text class="num" x="120" y="142">52</text>
+      <text class="num" x="40" y="197">62</text> <text class="num" x="120" y="197">72</text>
+      <text class="label" x="80" y="240" text-anchor="middle">page 2</text>
+    </g>
+
+    <!-- page 10 (representative) -->
+    <g transform="translate(480,80)">
+      <rect class="page" x="0" y="0" width="160" height="220" rx="4"/>
+      <line class="cell-line" x1="80" y1="0" x2="80" y2="220"/>
+      <line class="cell-line" x1="0" y1="55" x2="160" y2="55"/>
+      <line class="cell-line" x1="0" y1="110" x2="160" y2="110"/>
+      <line class="cell-line" x1="0" y1="165" x2="160" y2="165"/>
+      <text class="num" x="40" y="32">10</text>  <text class="num" x="120" y="32">20</text>
+      <text class="num" x="40" y="87">30</text>  <text class="num" x="120" y="87">40</text>
+      <text class="num" x="40" y="142">50</text> <text class="num" x="120" y="142">60</text>
+      <text class="num" x="40" y="197">70</text> <text class="num" x="120" y="197">80</text>
+      <text class="label" x="80" y="240" text-anchor="middle">page 10</text>
+    </g>
+    <text class="label" x="460" y="195" font-size="22">…</text>
+  </g>
+
+  <!-- ============== STAGE 2: stack ============== -->
+  <g id="stage-stack">
+    <text class="label" x="360" y="56" text-anchor="middle">Print and stack the 10 pages</text>
+    <g transform="translate(280,80)">
+      <rect class="page" x="-12" y="-12" width="160" height="220" rx="4" opacity="0.4"/>
+      <rect class="page" x="-6"  y="-6"  width="160" height="220" rx="4" opacity="0.7"/>
+      <rect class="page" x="0"   y="0"   width="160" height="220" rx="4"/>
+      <line class="cell-line" x1="80" y1="0" x2="80" y2="220"/>
+      <line class="cell-line" x1="0" y1="55" x2="160" y2="55"/>
+      <line class="cell-line" x1="0" y1="110" x2="160" y2="110"/>
+      <line class="cell-line" x1="0" y1="165" x2="160" y2="165"/>
+      <text class="num" x="40" y="32">1</text>   <text class="num" x="120" y="32">11</text>
+      <text class="num" x="40" y="87">21</text>  <text class="num" x="120" y="87">31</text>
+      <text class="num" x="40" y="142">41</text> <text class="num" x="120" y="142">51</text>
+      <text class="num" x="40" y="197">61</text> <text class="num" x="120" y="197">71</text>
+      <text class="label" x="80" y="240" text-anchor="middle">stack of 10 pages</text>
+    </g>
+  </g>
+
+  <!-- ============== STAGE 3: cut ============== -->
+  <g id="stage-cut">
+    <text class="label" x="360" y="56" text-anchor="middle">Cut along the dashed lines</text>
+    <g transform="translate(280,80)">
+      <rect class="page" x="-12" y="-12" width="160" height="220" rx="4" opacity="0.4"/>
+      <rect class="page" x="-6"  y="-6"  width="160" height="220" rx="4" opacity="0.7"/>
+      <rect class="page" x="0"   y="0"   width="160" height="220" rx="4"/>
+      <line class="cell-line" x1="80" y1="0" x2="80" y2="220"/>
+      <line class="cell-line" x1="0" y1="55" x2="160" y2="55"/>
+      <line class="cell-line" x1="0" y1="110" x2="160" y2="110"/>
+      <line class="cell-line" x1="0" y1="165" x2="160" y2="165"/>
+      <text class="num" x="40" y="32">1</text>   <text class="num" x="120" y="32">11</text>
+      <text class="num" x="40" y="87">21</text>  <text class="num" x="120" y="87">31</text>
+      <text class="num" x="40" y="142">41</text> <text class="num" x="120" y="142">51</text>
+      <text class="num" x="40" y="197">61</text> <text class="num" x="120" y="197">71</text>
+
+      <!-- moving blade -->
+      <g class="blade">
+        <line x1="-20" y1="-12" x2="-20" y2="232" stroke="#cf222e" stroke-width="2"/>
+        <text x="-20" y="-18" text-anchor="middle" font-size="14">✂</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ============== STAGE 4: strips fanned out ============== -->
+  <g id="stage-strips">
+    <text class="label" x="360" y="56" text-anchor="middle">Each strip is already in order: 1, 2, 3, …</text>
+    <g transform="translate(60,80)">
+      <!-- 4 strips, each containing tickets 1..10, 11..20, etc -->
+      <g>
+        <rect class="strip-fill-1" x="0" y="0" width="80" height="220" rx="4" stroke="#d2d2d7"/>
+        <text class="num" x="40" y="20">1</text>
+        <text class="num" x="40" y="40">2</text>
+        <text class="num" x="40" y="60">3</text>
+        <text class="num" x="40" y="80">4</text>
+        <text class="num" x="40" y="100">5</text>
+        <text class="num" x="40" y="120">6</text>
+        <text class="num" x="40" y="140">7</text>
+        <text class="num" x="40" y="160">8</text>
+        <text class="num" x="40" y="180">9</text>
+        <text class="num" x="40" y="200">10</text>
+      </g>
+      <g transform="translate(150,0)">
+        <rect class="strip-fill-2" x="0" y="0" width="80" height="220" rx="4" stroke="#d2d2d7"/>
+        <text class="num" x="40" y="20">11</text>
+        <text class="num" x="40" y="40">12</text>
+        <text class="num" x="40" y="60">13</text>
+        <text class="num" x="40" y="80">14</text>
+        <text class="num" x="40" y="100">15</text>
+        <text class="num" x="40" y="120">16</text>
+        <text class="num" x="40" y="140">17</text>
+        <text class="num" x="40" y="160">18</text>
+        <text class="num" x="40" y="180">19</text>
+        <text class="num" x="40" y="200">20</text>
+      </g>
+      <g transform="translate(300,0)">
+        <rect class="strip-fill-3" x="0" y="0" width="80" height="220" rx="4" stroke="#d2d2d7"/>
+        <text class="num" x="40" y="20">21</text>
+        <text class="num" x="40" y="40">22</text>
+        <text class="num" x="40" y="60">23</text>
+        <text class="num" x="40" y="80">…</text>
+        <text class="num" x="40" y="100">…</text>
+        <text class="num" x="40" y="120">…</text>
+        <text class="num" x="40" y="140">…</text>
+        <text class="num" x="40" y="160">28</text>
+        <text class="num" x="40" y="180">29</text>
+        <text class="num" x="40" y="200">30</text>
+      </g>
+      <g transform="translate(450,0)">
+        <rect class="strip-fill-4" x="0" y="0" width="80" height="220" rx="4" stroke="#d2d2d7"/>
+        <text class="num" x="40" y="20">71</text>
+        <text class="num" x="40" y="40">72</text>
+        <text class="num" x="40" y="60">73</text>
+        <text class="num" x="40" y="80">…</text>
+        <text class="num" x="40" y="100">…</text>
+        <text class="num" x="40" y="120">…</text>
+        <text class="num" x="40" y="140">…</text>
+        <text class="num" x="40" y="160">78</text>
+        <text class="num" x="40" y="180">79</text>
+        <text class="num" x="40" y="200">80</text>
+      </g>
+      <text class="label" x="395" y="118" font-size="22">…</text>
+    </g>
+  </g>
+
+  <!-- footer -->
+  <text class="label" x="360" y="345" text-anchor="middle">no manual sorting · just stack, cut, hand out</text>
+</svg>
