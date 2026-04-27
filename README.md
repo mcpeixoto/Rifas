@@ -9,7 +9,7 @@
 ![No tracking](https://img.shields.io/badge/tracking-none-success)
 
 <p align="center">
-  <img src="docs/stack-and-cut.svg" alt="How stack-and-cut numbering works" width="720" />
+  <img src="docs/stack-and-cut-en.svg" alt="How stack-and-cut numbering works" width="760" />
 </p>
 
 **Try it live →** <https://mcpeixoto.github.io/Rifas/>
@@ -119,6 +119,10 @@ Issues and PRs welcome. Things on the roadmap:
 ---
 
 ## Português
+
+<p align="center">
+  <img src="docs/stack-and-cut-pt.svg" alt="Como funciona a numeração empilha-e-corta" width="760" />
+</p>
 
 ### O que faz
 
