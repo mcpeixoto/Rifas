@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <rect x="2" y="6" width="20" height="12" rx="2" stroke="#1f6feb" stroke-width="2"/>
+  <line x1="8" y1="6" x2="8" y2="18" stroke="#1f6feb" stroke-width="2" stroke-dasharray="2 2"/>
+  <text x="13" y="15" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="#1f6feb">№</text>
+</svg>
