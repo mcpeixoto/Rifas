@@ -122,6 +122,24 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
       const cellX = mLeft + col * (cellW + gapX);
       const cellY = gridTop - (row + 1) * cellH - row * gapY;
 
+      const num = desc.rifaNumbers[cellIdx];
+      if (num === null) {
+        // No number left for this cell: leave it blank instead of printing a
+        // numberless rifa that would get cut out and thrown away.
+        if (cfg.drawCutLines) {
+          page.drawRectangle({
+            x: cellX,
+            y: cellY,
+            width: cellW,
+            height: cellH,
+            borderColor: rgb(0.85, 0.85, 0.85),
+            borderWidth: 0.3,
+            borderDashArray: [2, 2],
+          });
+        }
+        continue;
+      }
+
       // Place template
       if (cfg.rifaOrientation === 0) {
         page.drawPage(embedded, { x: cellX, y: cellY, xScale: scale, yScale: scale });
@@ -136,18 +154,6 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
         });
       }
 
-      const num = desc.rifaNumbers[cellIdx];
-      if (num === null) {
-        // Mark empty cell with light watermark
-        page.drawText('—', {
-          x: cellX + cellW / 2 - 4,
-          y: cellY + cellH / 2 - 4,
-          size: 12,
-          font,
-          color: rgb(0.85, 0.85, 0.85),
-        });
-        continue;
-      }
       const label = padNumber(num, cfg.padding);
 
       for (const slot of cfg.slots) {
