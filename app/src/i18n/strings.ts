@@ -95,6 +95,10 @@ export const dict = {
     en: (perPage: number, perSet: number, sets: number, total: number, empty: number) =>
       `${perPage}/page · set = ${perSet} tickets · ${sets} sets · ${total} pages${empty > 0 ? ` · ${empty} empty cells at the end` : ''}`,
   },
+  fillLastPage: {
+    pt: (next: number, last: number) => `Encher a última página: ${next} rifas (acaba em ${last})`,
+    en: (next: number, last: number) => `Fill the last page: ${next} tickets (ends at ${last})`,
+  },
   header: { pt: 'Cabeçalho', en: 'Header' },
   variables: { pt: 'Variáveis:', en: 'Variables:' },
   headerSize: { pt: 'Tamanho cabeçalho (pt)', en: 'Header size (pt)' },

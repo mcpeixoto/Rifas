@@ -21,6 +21,7 @@ export function NumberingPanel() {
   });
 
   const summaryFn = t('numberingSummary') as (a: number, b: number, c: number, d: number, e: number) => string;
+  const fillFn = t('fillLastPage') as (next: number, last: number) => string;
 
   return (
     <fieldset>
@@ -46,9 +47,16 @@ export function NumberingPanel() {
             onChange={e => patch({ padding: Math.max(1, parseInt(e.target.value) || 1) })} />
         </label>
       </div>
-      <div className="muted" style={{ marginBottom: 8 }}>
+      <div className="muted" style={{ marginBottom: empty > 0 ? 4 : 8 }}>
         {summaryFn(rifasPerPage, rifasPerSet, numSets, totalPages, empty)}
       </div>
+      {empty > 0 && (
+        <div style={{ marginBottom: 8 }}>
+          <button className="btn secondary" onClick={() => patch({ total: total + empty })}>
+            {fillFn(total + empty, startNumber + total + empty - 1)}
+          </button>
+        </div>
+      )}
 
       <label style={{ display: 'block', marginBottom: 6 }}>{t('header') as string}
         <input type="text" style={{ width: '100%' }} value={headerFormat}
