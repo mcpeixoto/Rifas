@@ -34,6 +34,8 @@ export type ComposeConfig = {
   fontFamily: 'HelveticaBold' | 'Helvetica';
 
   drawCutLines?: boolean;
+  /** Render only the first N pages (used by the preview). */
+  maxPages?: number;
 };
 
 export type Progress = (done: number, total: number) => void;
@@ -81,7 +83,8 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
     pagesPerSet: cfg.pagesPerSet,
     rifasPerPage: cfg.rows * cfg.cols,
   };
-  const pages = buildPages(numbering);
+  const allPages = buildPages(numbering);
+  const pages = cfg.maxPages != null ? allPages.slice(0, cfg.maxPages) : allPages;
 
   const totalPages = pages.length;
   for (let pIdx = 0; pIdx < totalPages; pIdx++) {
@@ -97,7 +100,7 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
       font,
       color: rgb(0.1, 0.1, 0.1),
     });
-    page.drawText(`pág. ${desc.pageNumber} (set ${desc.setIdx + 1}, ${desc.pageInSet}/${cfg.pagesPerSet})`, {
+    page.drawText(`pág. ${desc.pageNumber} (set ${desc.setIdx + 1}, ${desc.pageInSet}/${desc.pagesInSet})`, {
       x: A4w - mRight - 160,
       y: A4h - mTop - cfg.headerSize,
       size: cfg.headerSize,
@@ -184,6 +187,7 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
 }
 
 export async function composeFirstPagePreview(cfg: ComposeConfig): Promise<Uint8Array> {
-  const previewCfg: ComposeConfig = { ...cfg, total: cfg.rows * cfg.cols };
+  // Keep the real total so the preview shows the numbers page 1 will actually get.
+  const previewCfg: ComposeConfig = { ...cfg, maxPages: 1 };
   return composePdf(previewCfg);
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as pdfjs from 'pdfjs-dist';
 import { useStore } from '../state/store';
 import { composeFirstPagePreview, ComposeConfig } from '../pdf/embedAndCompose';
+import { summarize } from '../pdf/numbering';
 import { useT, useLang } from '../i18n';
 
 const PREVIEW_WIDTH = 700;
@@ -69,8 +70,12 @@ export function PreviewPanel() {
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         await page.render({ canvasContext: ctx, viewport }).promise;
         const rifasPerPage = cfg.rows * cfg.cols;
-        const rifasPerSet = rifasPerPage * cfg.pagesPerSet;
-        const totalPages = Math.ceil(cfg.total / rifasPerSet) * cfg.pagesPerSet;
+        const { totalPages } = summarize({
+          total: cfg.total,
+          startNumber: cfg.startNumber,
+          pagesPerSet: cfg.pagesPerSet,
+          rifasPerPage,
+        });
         const orient = lang === 'pt'
           ? (cfg.a4Orientation === 'portrait' ? 'retrato' : 'paisagem')
           : cfg.a4Orientation;

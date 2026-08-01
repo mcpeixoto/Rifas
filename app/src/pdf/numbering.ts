@@ -10,20 +10,37 @@ export type PageDescriptor = {
   setFirst: number;
   setLast: number;
   pageInSet: number;
+  /** How many sheets this set actually has (< pagesPerSet for a partial last set). */
+  pagesInSet: number;
   pageNumber: number;
   rifaNumbers: (number | null)[];
 };
+
+/**
+ * Sheets in a given set. Full sets use pagesPerSet; the final partial set only
+ * gets as many sheets as its leftover rifas need, so it doesn't trail dozens of
+ * blank cells across full-size pages.
+ */
+export function pagesInSet(cfg: NumberingConfig, setIdx: number): number {
+  const rifasPerSet = cfg.rifasPerPage * cfg.pagesPerSet;
+  const remaining = cfg.total - setIdx * rifasPerSet;
+  if (remaining >= rifasPerSet) return cfg.pagesPerSet;
+  return Math.min(cfg.pagesPerSet, Math.max(1, Math.ceil(remaining / cfg.rifasPerPage)));
+}
 
 export function computeRifaNumber(
   cfg: NumberingConfig,
   setIdx: number,
   pageInSet: number,
   cellIdx: number,
+  stride: number = pagesInSet(cfg, setIdx),
 ): number | null {
+  // stride == sheets in this set, so stacking the set and cutting a column
+  // yields consecutive numbers.
   const n =
     cfg.startNumber +
     setIdx * cfg.pagesPerSet * cfg.rifasPerPage +
-    cellIdx * cfg.pagesPerSet +
+    cellIdx * stride +
     (pageInSet - 1);
   if (n >= cfg.startNumber + cfg.total) return null;
   return n;
@@ -38,20 +55,34 @@ export function buildPages(cfg: NumberingConfig): PageDescriptor[] {
   for (let setIdx = 0; setIdx < numSets; setIdx++) {
     const setFirst = cfg.startNumber + setIdx * rifasPerSet;
     const setLast = Math.min(cfg.startNumber + cfg.total - 1, setFirst + rifasPerSet - 1);
-    for (let pageInSet = 1; pageInSet <= cfg.pagesPerSet; pageInSet++) {
+    const sheets = pagesInSet(cfg, setIdx);
+    for (let pageInSet = 1; pageInSet <= sheets; pageInSet++) {
       const rifaNumbers: (number | null)[] = [];
       let allNull = true;
       for (let cellIdx = 0; cellIdx < cfg.rifasPerPage; cellIdx++) {
-        const n = computeRifaNumber(cfg, setIdx, pageInSet, cellIdx);
+        const n = computeRifaNumber(cfg, setIdx, pageInSet, cellIdx, sheets);
         if (n !== null) allNull = false;
         rifaNumbers.push(n);
       }
       if (allNull) continue;
-      pages.push({ setIdx, setFirst, setLast, pageInSet, pageNumber, rifaNumbers });
+      pages.push({ setIdx, setFirst, setLast, pageInSet, pagesInSet: sheets, pageNumber, rifaNumbers });
       pageNumber++;
     }
   }
   return pages;
+}
+
+export type NumberingSummary = {
+  numSets: number;
+  totalPages: number;
+  emptyCells: number;
+};
+
+export function summarize(cfg: NumberingConfig): NumberingSummary {
+  const pages = buildPages(cfg);
+  const cells = pages.length * cfg.rifasPerPage;
+  const numSets = pages.length ? pages[pages.length - 1].setIdx + 1 : 0;
+  return { numSets, totalPages: pages.length, emptyCells: Math.max(0, cells - cfg.total) };
 }
 
 export function padNumber(n: number, padding: number): string {

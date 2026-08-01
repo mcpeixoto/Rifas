@@ -1,4 +1,5 @@
 import { useStore } from '../state/store';
+import { summarize } from '../pdf/numbering';
 import { useT } from '../i18n';
 
 export function NumberingPanel() {
@@ -15,9 +16,9 @@ export function NumberingPanel() {
 
   const rifasPerPage = rows * cols;
   const rifasPerSet = rifasPerPage * pagesPerSet;
-  const numSets = Math.ceil(total / rifasPerSet);
-  const totalPages = numSets * pagesPerSet;
-  const empty = numSets * rifasPerSet - total;
+  const { numSets, totalPages, emptyCells: empty } = summarize({
+    total, startNumber, pagesPerSet, rifasPerPage,
+  });
 
   const summaryFn = t('numberingSummary') as (a: number, b: number, c: number, d: number, e: number) => string;
 

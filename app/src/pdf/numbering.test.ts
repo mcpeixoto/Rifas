@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildPages, computeRifaNumber, padNumber } from './numbering';
+import { buildPages, computeRifaNumber, padNumber, summarize } from './numbering';
 
 describe('numbering', () => {
   it('matches user example: 8/page, 10 pages/set, total 80', () => {
@@ -36,6 +36,46 @@ describe('numbering', () => {
     // last page: 70, 80(null since 80>=76)... cell 0 = 10
     expect(pages[9].rifaNumbers[0]).toBe(10);
     expect(pages[9].rifaNumbers[7]).toBeNull(); // 80 > 75
+  });
+
+  it('shrinks the final partial set instead of leaving whole blank pages', () => {
+    // 500 rifas, 8/page, 10 pages/set -> 6 full sets (480) + 20 leftover.
+    // The leftover set needs only ceil(20/8) = 3 pages, not 10.
+    const cfg = { total: 500, startNumber: 1500, pagesPerSet: 10, rifasPerPage: 8 };
+    const pages = buildPages(cfg);
+    expect(pages).toHaveLength(63);
+
+    const lastSet = pages.filter(p => p.setIdx === 6);
+    expect(lastSet).toHaveLength(3);
+    expect(lastSet.every(p => p.pagesInSet === 3)).toBe(true);
+    // stride within the leftover set is 3 (one per sheet), so columns fill up
+    expect(lastSet[0].rifaNumbers).toEqual([1980, 1983, 1986, 1989, 1992, 1995, 1998, null]);
+    expect(lastSet[1].rifaNumbers).toEqual([1981, 1984, 1987, 1990, 1993, 1996, 1999, null]);
+    expect(lastSet[2].rifaNumbers).toEqual([1982, 1985, 1988, 1991, 1994, 1997, null, null]);
+
+    // every number 1500..1999 appears exactly once
+    const seen = pages.flatMap(p => p.rifaNumbers).filter((n): n is number => n !== null);
+    expect(seen).toHaveLength(500);
+    expect(new Set(seen).size).toBe(500);
+    expect(Math.min(...seen)).toBe(1500);
+    expect(Math.max(...seen)).toBe(1999);
+  });
+
+  it('full sets keep the configured stride and page count', () => {
+    const cfg = { total: 500, startNumber: 1500, pagesPerSet: 10, rifasPerPage: 8 };
+    const pages = buildPages(cfg);
+    expect(pages[0].pagesInSet).toBe(10);
+    expect(pages[0].rifaNumbers).toEqual([1500, 1510, 1520, 1530, 1540, 1550, 1560, 1570]);
+    expect(pages[0].setLast).toBe(1579);
+    expect(pages.filter(p => p.setIdx === 6)[0].setFirst).toBe(1980);
+    expect(pages.filter(p => p.setIdx === 6)[0].setLast).toBe(1999);
+  });
+
+  it('summarize reports pages and empty cells actually produced', () => {
+    const s = summarize({ total: 500, startNumber: 1500, pagesPerSet: 10, rifasPerPage: 8 });
+    expect(s.numSets).toBe(7);
+    expect(s.totalPages).toBe(63);
+    expect(s.emptyCells).toBe(4);
   });
 
   it('respects startNumber offset', () => {
