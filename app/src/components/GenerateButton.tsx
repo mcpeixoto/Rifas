@@ -23,6 +23,7 @@ function buildCfg(s: ReturnType<typeof useStore.getState>): ComposeConfig {
     headerSize: s.headerSize,
     fontFamily: s.fontFamily,
     drawCutLines: s.drawCutLines,
+    flattenDpi: s.flattenDpi,
   };
 }
 
@@ -45,6 +46,8 @@ export function GenerateButton() {
 
   const hasTemplate = useStore(s => !!s.templateBytes);
   const hasSlots = useStore(s => s.slots.length > 0);
+  const flattenDpi = useStore(s => s.flattenDpi);
+  const patch = useStore(s => s.patch);
   const generatingFn = t('generating') as (a: number, b: number) => string;
 
   const generate = async () => {
@@ -83,6 +86,18 @@ export function GenerateButton() {
   return (
     <fieldset>
       <legend>{t('generate') as string}</legend>
+      <div className="row" style={{ marginBottom: 6 }}>
+        <label>
+          {t('fastPrint') as string}
+          <span className="help-icon" title={t('fastPrintHelp') as string}>?</span>
+          <select value={flattenDpi} onChange={e => patch({ flattenDpi: parseInt(e.target.value) })}>
+            <option value={0}>{t('dpiOff') as string}</option>
+            <option value={150}>{t('dpiDraft') as string}</option>
+            <option value={300}>{t('dpiNormal') as string}</option>
+            <option value={450}>{t('dpiHigh') as string}</option>
+          </select>
+        </label>
+      </div>
       <div className="row" style={{ marginBottom: 6 }}>
         <button className="btn secondary" onClick={generatePreview} disabled={busy || !hasTemplate || !hasSlots}>
           {t('previewOnePage') as string}

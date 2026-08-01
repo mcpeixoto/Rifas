@@ -1,4 +1,5 @@
-import { PDFDocument, StandardFonts, degrees, rgb, PDFFont, PDFEmbeddedPage } from 'pdf-lib';
+import { PDFDocument, PDFPage, StandardFonts, degrees, rgb, PDFEmbeddedPage, PDFImage } from 'pdf-lib';
+import { rasterizeTemplate } from './rasterize';
 
 function hexToRgb(hex: string): [number, number, number] {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
@@ -36,6 +37,12 @@ export type ComposeConfig = {
   drawCutLines?: boolean;
   /** Render only the first N pages (used by the preview). */
   maxPages?: number;
+  /**
+   * Flatten the template to one opaque raster at this print DPI before tiling.
+   * Costs a little sharpness, saves the printer from re-flattening the
+   * template's transparency once per ticket. Undefined/0 keeps the vector path.
+   */
+  flattenDpi?: number;
 };
 
 export type Progress = (done: number, total: number) => void;
@@ -43,7 +50,6 @@ export type Progress = (done: number, total: number) => void;
 export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Promise<Uint8Array> {
   const outDoc = await PDFDocument.create();
   const srcDoc = await PDFDocument.load(cfg.templateBytes);
-  const [embedded] = await outDoc.embedPdf(srcDoc, [cfg.templatePageIndex]);
   const font = await outDoc.embedFont(
     cfg.fontFamily === 'HelveticaBold' ? StandardFonts.HelveticaBold : StandardFonts.Helvetica,
   );
@@ -51,8 +57,9 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
   const A4w = cfg.a4Orientation === 'portrait' ? A4_PT.w : A4_PT.h;
   const A4h = cfg.a4Orientation === 'portrait' ? A4_PT.h : A4_PT.w;
 
-  const tW = embedded.width;
-  const tH = embedded.height;
+  const srcPage = srcDoc.getPage(cfg.templatePageIndex);
+  const tW = srcPage.getWidth();
+  const tH = srcPage.getHeight();
 
   const rW = cfg.rifaOrientation === 0 ? tW : tH;
   const rH = cfg.rifaOrientation === 0 ? tH : tW;
@@ -76,6 +83,31 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
 
   const cellW = rW * scale;
   const cellH = rH * scale;
+
+  // The ticket artwork: either the template page itself, or a flat raster of it.
+  let raster: PDFImage | null = null;
+  let embedded: PDFEmbeddedPage | null = null;
+  if (cfg.flattenDpi && cfg.flattenDpi > 0) {
+    // The template's own width ends up occupying tW * scale points on paper.
+    const targetWidthPx = Math.round((tW * scale / 72) * cfg.flattenDpi);
+    const flat = await rasterizeTemplate(cfg.templateBytes, cfg.templatePageIndex, targetWidthPx);
+    raster = await outDoc.embedJpg(flat.jpeg);
+  } else {
+    [embedded] = await outDoc.embedPdf(srcDoc, [cfg.templatePageIndex]);
+  }
+
+  /** Draw one ticket with its bottom-left corner at (x, y). */
+  const drawTicket = (page: PDFPage, x: number, y: number) => {
+    // rifaOrientation 90 rotates around (x,y), so shift right by the rotated width.
+    const at = cfg.rifaOrientation === 0
+      ? { x, y }
+      : { x: x + tH * scale, y, rotate: degrees(90) };
+    if (raster) {
+      page.drawImage(raster, { ...at, width: tW * scale, height: tH * scale });
+    } else {
+      page.drawPage(embedded!, { ...at, xScale: scale, yScale: scale });
+    }
+  };
 
   const numbering: NumberingConfig = {
     total: cfg.total,
@@ -140,19 +172,7 @@ export async function composePdf(cfg: ComposeConfig, onProgress?: Progress): Pro
         continue;
       }
 
-      // Place template
-      if (cfg.rifaOrientation === 0) {
-        page.drawPage(embedded, { x: cellX, y: cellY, xScale: scale, yScale: scale });
-      } else {
-        // 90° CCW rotation around (x,y); offset so cell visually starts at cellX
-        page.drawPage(embedded, {
-          x: cellX + tH * scale,
-          y: cellY,
-          xScale: scale,
-          yScale: scale,
-          rotate: degrees(90),
-        });
-      }
+      drawTicket(page, cellX, cellY);
 
       const label = padNumber(num, cfg.padding);
 

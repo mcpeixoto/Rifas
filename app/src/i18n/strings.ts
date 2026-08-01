@@ -105,6 +105,16 @@ export const dict = {
 
   // generate
   generate: { pt: 'Gerar', en: 'Generate' },
+  fastPrint: { pt: 'Impressão rápida', en: 'Fast printing' },
+  fastPrintHelp: {
+    pt: 'Achata o template numa imagem antes de repetir. Templates do Canva têm transparências que a impressora recalcula em cada rifa — sem isto, uma página pode demorar minutos.',
+    en: 'Flattens the template to one image before tiling. Canva-style templates carry transparency the printer re-flattens for every ticket — without this a single sheet can take minutes.',
+  },
+  fastPrintQuality: { pt: 'Qualidade', en: 'Quality' },
+  dpiDraft: { pt: '150 DPI (rascunho)', en: '150 DPI (draft)' },
+  dpiNormal: { pt: '300 DPI (recomendado)', en: '300 DPI (recommended)' },
+  dpiHigh: { pt: '450 DPI (alta)', en: '450 DPI (high)' },
+  dpiOff: { pt: 'Desligado (vetores)', en: 'Off (vectors)' },
   previewOnePage: { pt: 'Descarregar 1 página', en: 'Download 1-page sample' },
   generatePdf: { pt: 'Gerar PDF completo', en: 'Generate full PDF' },
   generating: {

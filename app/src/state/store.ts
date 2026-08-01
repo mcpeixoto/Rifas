@@ -28,6 +28,8 @@ export type AppConfig = {
   headerSize: number;
   fontFamily: 'HelveticaBold' | 'Helvetica';
   drawCutLines: boolean;
+  /** 0 = keep template vectors; >0 = flatten to a raster at this DPI. */
+  flattenDpi: number;
 };
 
 type AppState = AppConfig & {
@@ -67,6 +69,7 @@ const defaultConfig: AppConfig = {
   headerSize: 10,
   fontFamily: 'HelveticaBold',
   drawCutLines: false,
+  flattenDpi: 300,
 };
 
 export const useStore = create<AppState>((set, get) => ({
