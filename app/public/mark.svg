@@ -1,0 +1,20 @@
+<svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" role="img" aria-label="rifas mark">
+  <title>rifas</title>
+  <style>
+  /* Self-contained: this file animates on its own, no host stylesheet. */
+  svg { color: #1f2937; }
+  [class^="anim-"] { animation-iteration-count: infinite; transform-box: fill-box; transform-origin: center; }
+  .anim-rifas-num { animation-name: rifas-count; animation-duration: 2200ms; animation-timing-function: cubic-bezier(.35,0,.15,1); }
+  .anim-rifas-next { animation-name: rifas-count-next; animation-duration: 2200ms; animation-timing-function: cubic-bezier(.35,0,.15,1); }
+  @keyframes rifas-count      { 0%, 100% { transform: translateY(0);      opacity: 1; } 14% { transform: translateY(0); opacity: 1; } 34% { transform: translateY(-1.5px); opacity: 0; } 56% { transform: translateY(1.5px); opacity: 0; } 62% { transform: translateY(1.5px); opacity: 0; } 82% { transform: translateY(0); opacity: 1; } }
+  @keyframes rifas-count-next { 0%, 100% { transform: translateY(1.5px);  opacity: 0; } 14% { transform: translateY(1.5px); opacity: 0; } 34% { transform: translateY(0); opacity: 1; } 62% { transform: translateY(0); opacity: 1; } 82% { transform: translateY(-1.5px); opacity: 0; } 84% { transform: translateY(1.5px); opacity: 0; } }
+  @media (prefers-color-scheme: dark) {
+    svg { color: #e5e7eb; }
+  }
+  @media (prefers-reduced-motion: reduce) { [class^="anim-"] { animation: none !important; } }
+  </style>
+  <rect x="2" y="6" width="20" height="12" rx="2" stroke="#1f6feb" stroke-width="2"/>
+  <line x1="8" y1="6" x2="8" y2="18" stroke="#1f6feb" stroke-width="2" stroke-dasharray="2 2"/>
+  <text x="13" y="15" font-family="Inter, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="7" font-weight="700" fill="#1f6feb" class="anim-rifas-num">№</text>
+  <text x="13" y="15" font-family="Inter, -apple-system, Segoe UI, Roboto, Helvetica Neue, Arial, sans-serif" font-size="7" font-weight="700" fill="#1f6feb" opacity="0" class="anim-rifas-next">№</text>
+</svg>
