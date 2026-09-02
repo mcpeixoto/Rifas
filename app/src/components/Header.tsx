@@ -34,11 +34,15 @@ export function Header() {
 }
 
 function Logo() {
+  // The ticket number rolls over like an odometer -- one draw handing off to
+  // the next, which is what a rifa is. Motion lives in styles.css so it stops
+  // under prefers-reduced-motion.
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg className="logo-mark" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="2" y="6" width="20" height="12" rx="2" stroke="currentColor" strokeWidth="1.6" />
       <line x1="8" y1="6" x2="8" y2="18" stroke="currentColor" strokeWidth="1.6" strokeDasharray="2 2" />
-      <text x="13" y="15" fontSize="7" fontWeight="700" fill="currentColor">№</text>
+      <text className="anim-rifas-num" x="13" y="15" fontSize="7" fontWeight="700" fill="currentColor">№</text>
+      <text className="anim-rifas-next" x="13" y="15" fontSize="7" fontWeight="700" fill="currentColor" opacity="0">№</text>
     </svg>
   );
 }
